@@ -61,12 +61,26 @@ int main(int argc, char *argv[])
     }
 
     // TODO: Perform the matrix-vector multiplication
+    // go through each row
+    for (int i = 0; i < n_row1; i++)
+    {
+        int dotProduct = 0; // running total that will be written to corresponding spot in output vector
+        // for each row, go through each column
+        for (int j = 0; j < n_col1; j++)
+        {
+            // perform matrix multiplication (dot product)
+            // each element of current row is multiplied by corresponding element in column vector
+            dotProduct += inputMatrix[i * n_col1 + j] * inputVector[j];
+        }
+        outputVector[i] = dotProduct; // after computing dot product, update output vector at corresponding row
+    }
 
     // TODO: Write the output CSV file
     // use fputs(outputVector[i] /n, outputFile)
-    // for (int i = 0; i < n_row1; i++){
-    //     fprintf(outputFile, "%d\n", outputVector[i]);// write each element in row of outputVector to output file
-    // }
+    for (int i = 0; i < n_row1; i++)
+    {
+        fprintf(outputFile, "%d\n", outputVector[i]); // write each element in row of outputVector to output file
+    }
 
     // TODO: Free memory
     free(inputMatrix);
