@@ -1,3 +1,7 @@
+// Alan Vo
+// OU Spring 2026
+// PDN: project 1, problem 2
+
 #include <stdio.h>
 #include <stdlib.h>
 // Use more libraries as necessary
@@ -26,60 +30,59 @@ int main(int argc, char *argv[])
     // Get dim of the matrix
     char *p1;
     char *p2;
-    int n_row1 = strtol(argv[2], &p1, 10);
-    int n_col1 = strtol(argv[3], &p2, 10);
+    long int n_row1 = strtol(argv[2], &p1, 10);
+    long int n_col1 = strtol(argv[3], &p2, 10);
 
     // Get dim of the vector
     char *p3;
-    int n_row2 = strtol(argv[5], &p3, 10);
+    long int n_row2 = strtol(argv[5], &p3, 10);
 
     // Get the output file
     FILE *outputFile = fopen(argv[6], "w");
 
     // TODO: Use malloc to allocate memory for the matrices
-    int *inputMatrix = malloc((n_row1 * n_col1) * sizeof(int)); // input matrix
-    int *inputVector = malloc(n_row2 * sizeof(int));            // input vector
-    int *outputVector = malloc(n_row1 * sizeof(int));           // output vector has dim (n_row1 x 1)
+    long int *inputMatrix = malloc((n_row1 * n_col1) * sizeof(long int));
+    long int *inputVector = malloc(n_row2 * sizeof(long int));
+    long int *outputVector = malloc(n_row1 * sizeof(long int)); // output vector has dim (n_row1 x 1)
 
     // TODO: Parse the input CSV files
-    // used to keep track of where to insert element as we get integer from files
-    int inputMatrixIndex = 0, inputVectorIndex = 0;
+    // used to keep track of where to insert integers as they are parsed from files
+    long int inputMatrixIndex = 0, inputVectorIndex = 0;
 
-    // write values from matFile into inputMatrix
-    // fscanf will return EOF when end of file is reached, and stop when reading new line
-    // %d, handles int followed by comma pattern in csv file
-    // in while condition, fscanf reads from file and inserts into array using &inputMatrix[i] as address of element at index i
-    while (fscanf(matFile, "%d,", &inputMatrix[inputMatrixIndex]) != EOF)
+    // write values from matFile into inputMatrix in row-major order
+    // fscanf returns EOF when end of file is reached, and stops when reading new line
+    // %d, handles the int followed by comma pattern present in csv file
+    // in while condition, fscanf reads from file AND uses &inputMatrix[i] (address of element at index i) to "insert" into array
+    while (fscanf(matFile, "%ld,", &inputMatrix[inputMatrixIndex]) != EOF)
     {
         inputMatrixIndex++; // move on to next array index
     }
 
     // write values from vecFile into inputVector in same manner as above
-    while (fscanf(vecFile, "%d,", &inputVector[inputVectorIndex]) != EOF)
+    while (fscanf(vecFile, "%ld,", &inputVector[inputVectorIndex]) != EOF)
     {
         inputVectorIndex++; // update index to know where to insert next integer into the array
     }
 
     // TODO: Perform the matrix-vector multiplication
-    // go through each row
-    for (int i = 0; i < n_row1; i++)
+    // go through each row of input matrix
+    for (long int i = 0; i < n_row1; i++)
     {
-        int dotProduct = 0; // running total that will be written to corresponding spot in output vector
+        long int dotProduct = 0; // running total that will be written to corresponding spot in output vector
         // for each row, go through each column
-        for (int j = 0; j < n_col1; j++)
+        for (long int j = 0; j < n_col1; j++)
         {
             // perform matrix multiplication (dot product)
             // each element of current row is multiplied by corresponding element in column vector
             dotProduct += inputMatrix[i * n_col1 + j] * inputVector[j];
         }
-        outputVector[i] = dotProduct; // after computing dot product, update output vector at corresponding row
+        outputVector[i] = dotProduct; // after computing dot product, update output vector
     }
 
     // TODO: Write the output CSV file
-    // use fputs(outputVector[i] /n, outputFile)
-    for (int i = 0; i < n_row1; i++)
+    for (long int i = 0; i < n_row1; i++)
     {
-        fprintf(outputFile, "%d\n", outputVector[i]); // write each element in row of outputVector to output file
+        fprintf(outputFile, "%ld\n", outputVector[i]); // write each element in outputVector to output file
     }
 
     // TODO: Free memory
