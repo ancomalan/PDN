@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
     FILE *outputFile = fopen(argv[6], "w");
 
     // TODO: Use malloc to allocate memory for the matrices
-    long int *inputMatrix = malloc((n_row1 * n_col1) * sizeof(long int));
-    long int *inputVector = malloc(n_row2 * sizeof(long int));
-    long int *outputVector = malloc(n_row1 * sizeof(long int)); // output vector has dim (n_row1 x 1)
+    long int* inputMatrix = (long int*)malloc((n_row1 * n_col1) * sizeof(long int)); // typecast since malloc returns void pointer
+    long int* inputVector = (long int*)malloc(n_row2 * sizeof(long int));
+    long int* outputVector = (long int*)malloc(n_row1 * sizeof(long int)); // output vector has dim (n_row1 x 1)
 
     // TODO: Parse the input CSV files
     // used to keep track of where to insert integers as they are parsed from files
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     // write values from matFile into inputMatrix in row-major order
     // fscanf returns EOF when end of file is reached, and stops when reading new line
-    // %d, handles the int followed by comma pattern present in csv file
+    // %ld, handles the long int followed by comma pattern present in csv file
     // in while condition, fscanf reads from file AND uses &inputMatrix[i] (address of element at index i) to "insert" into array
     while (fscanf(matFile, "%ld,", &inputMatrix[inputMatrixIndex]) != EOF)
     {
