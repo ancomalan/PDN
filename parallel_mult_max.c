@@ -5,9 +5,9 @@
 
 #define DEBUG 0
 
-/* ----------- Project 2 - Problem 2A - Matrix Mult -----------
+/* ----------- Project 2 - Problem 2A -----------
 
-    This file will multiply two matricies and find maximum element using join by reduction.
+    This file will multiply two matrices and find maximum element in output matrix using join by reduction.
 */
 // ------------------------------------------------------ //
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     // Catch console errors
     if (argc != 10)
     {
-        printf("USE LIKE THIS: parallel_mult_mat_mat file_A.csv n_row_A n_col_A file_B.csv n_row_B n_col_B result_matrix.csv time.csv num_threads \n");
+        printf("USE LIKE THIS: parallel_mult_max file_A.csv n_row_A n_col_A file_B.csv n_row_B n_col_B result_matrix.csv time.csv num_threads \n");
         return EXIT_FAILURE;
     }
 
