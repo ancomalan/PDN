@@ -5,9 +5,9 @@
 
 #define DEBUG 0
 
-/* ----------- Project 2 - Problem 2A - Matrix Mult -----------
+/* ----------- Project 2 - Problem 2B -----------
 
-    This file will multiply two matricies and find maximum element using join by reduction.
+    This file will multiply two matricies and find second maximum element using serial reduction
 */
 // ------------------------------------------------------ //
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     // Catch console errors
     if (argc != 10)
     {
-        printf("USE LIKE THIS: parallel_mult_mat_mat file_A.csv n_row_A n_col_A file_B.csv n_row_B n_col_B result_matrix.csv time.csv num_threads \n");
+        printf("USE LIKE THIS: parallel_mult_second_largest file_A.csv n_row_A n_col_A file_B.csv n_row_B n_col_B result_matrix.csv time.csv num_threads \n");
         return EXIT_FAILURE;
     }
 
@@ -73,15 +73,16 @@ int main(int argc, char *argv[])
 
     // TODO: Parallelize the matrix-matrix multiplication and find the max element
 
-    // got idea from gemini to use two arrays as shared variables (indexed by thread id)
-    long int localLargest[thread_count];
-    long int localSecondLargest[thread_count];
+    // got idea from Google Gemini to use two dynamic arrays as shared variables (local solutions indexed by thread id)
+    // learned from Gemini that both the largest and second largest elements from each thread must be considered to determine global second largest
+    long int *localLargest = (long int *)malloc(thread_count * sizeof(long int));
+    long int *localSecondLargest = (long int *)malloc(thread_count * sizeof(long int));
 
-#pragma omp parallel num_threads(thread_count) // parallel region with specified number of threads
+#pragma omp parallel num_threads(thread_count) // enter parallel region with specified number of threads
     {
         long int largest = 0;                   // tracks largest value for this thread
         long int secondLargest = 0;             // tracks second largest value for this thread
-        int thread_rank = omp_get_thread_num(); // get thread id to output values into shared arrays
+        int thread_rank = omp_get_thread_num(); // get thread id to store into shared arrays
 
 // #pragma omp for: distributes columns (outer loop iterations) in B between the threads
 // each thread computes a batch of independent column vectors for C
@@ -103,8 +104,8 @@ int main(int argc, char *argv[])
                 // update local largest and secondLargest
                 if (dotProduct > largest)
                 {
-                    secondLargest = largest; // second largest becomes previous pargest
-                    largest = dotProduct;    // assign new largest
+                    secondLargest = largest; // second largest becomes old largest
+                    largest = dotProduct;    // assign current value as new largest
                 }
                 else if (dotProduct > secondLargest)
                 {
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
     long int globalLargest = 0, globalSecondLargest = 0;
     for (int i = 0; i < thread_count; i++)
     {
-        // first, check local solutions of localLargest
+        // first, check local solution in localLargest
         if (localLargest[i] > globalLargest)
         {
             globalSecondLargest = globalLargest;
@@ -132,7 +133,8 @@ int main(int argc, char *argv[])
             globalSecondLargest = localLargest[i];
         }
 
-        // then, check whether local solution of secondLargest is greater than globalSecondLargest
+        // then, check if local solution of localSecondLargest is greater than globalSecondLargest
+        // localSecondLargest[i] can NOT be bigger than localLargest[i], so we can skip this check
         if (localSecondLargest[i] > globalSecondLargest)
         {
             globalSecondLargest = localSecondLargest[i]; // set new globalSecondLargest
@@ -154,6 +156,8 @@ int main(int argc, char *argv[])
     // free memory
     free(A);
     free(B);
+    free(localLargest);
+    free(localSecondLargest);
 
     // Cleanup
     fclose(inputMatrix1);
