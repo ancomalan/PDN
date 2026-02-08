@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
         {
             // 8 bit byte = 2^8 or 256 possible different characters (extended ASCII)
             // join by concatentation
-            encrypted_buffer[i] = buffer[i] + key % 256; // TODO: Encrypt a character from the input buffer.
+            encrypted_buffer[i] = (buffer[i] + key) % 256; // TODO: Encrypt a character from the input buffer.
         }
     }
 
